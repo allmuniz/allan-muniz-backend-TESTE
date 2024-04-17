@@ -53,12 +53,12 @@ public class WalletController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
     @Operation(summary = "Search wallet",
             description = "This function is responsible for looking for your wallet.")
-    public ResponseEntity<Object> searchWallet(@PathVariable long id){
+    public ResponseEntity<Object> searchWallet(@PathVariable long userId){
         try {
-            var result = this.walletService.myWallet(id);
+            var result = this.walletService.myWallet(userId);
             return ResponseEntity.ok().body(result);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

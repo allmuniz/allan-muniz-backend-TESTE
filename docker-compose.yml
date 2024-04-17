@@ -1,0 +1,25 @@
+version: '3.2'
+services:
+  rabbitmq_bootcamp1:
+    build:
+      context: ./rabbitmq
+    image: allmuniz/rabbitmq1_bootcamp:latest
+    ports:
+      - 15672:15672
+      - 5672:5672
+    container_name: rabbitmq1_bootcamp
+    networks:
+      - backend1
+  postgres_bootcamp1:
+    build:
+      context: ./postgres
+    image: allmuniz/postgres1_bootcamp:latest
+    ports:
+      - 5434:5432
+    command: bash -c "rm -rf /var/lib/postgresql/data/* && docker-entrypoint.sh postgres"
+    container_name: postgres1_bootcamp
+    networks:
+      - backend1
+networks:
+  backend1:
+    driver: "bridge"

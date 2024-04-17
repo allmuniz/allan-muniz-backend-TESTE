@@ -2,14 +2,12 @@ package br.com.sysmap.bootcamp.domain.entities.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+@Setter
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
