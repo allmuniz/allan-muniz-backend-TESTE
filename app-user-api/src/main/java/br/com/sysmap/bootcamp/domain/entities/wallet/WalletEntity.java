@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -26,7 +27,7 @@ public class WalletEntity {
     @Column(name = "user_id")
     private long userId;
 
-    private Integer balance;
+    private BigDecimal balance;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

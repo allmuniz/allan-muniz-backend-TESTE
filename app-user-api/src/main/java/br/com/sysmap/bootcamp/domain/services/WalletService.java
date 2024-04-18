@@ -6,8 +6,11 @@ import br.com.sysmap.bootcamp.domain.entities.wallet.exceptions.InsufficientFund
 import br.com.sysmap.bootcamp.domain.entities.wallet.exceptions.WalletNotFoundException;
 import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
 import br.com.sysmap.bootcamp.domain.repositories.WalletRepository;
+import br.com.sysmap.bootcamp.dto.WalletDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +25,7 @@ public class WalletService {
 
         var wallet = WalletEntity.builder()
                 .userId(idUser)
-                .balance(0)
+                .balance(new BigDecimal(1999))
                 .build();
         return walletRepository.save(wallet);
     }
@@ -30,21 +33,21 @@ public class WalletService {
     public WalletEntity credit(long idWallet , Integer value){
 
         var wallet = walletRepository.findById(idWallet).orElseThrow(WalletNotFoundException::new);
-        wallet.setBalance(wallet.getBalance() + value);
+        wallet.setBalance(wallet.getBalance().add(new BigDecimal(value)));
         return walletRepository.save(wallet);
     }
 
-    public WalletEntity debit(long idWallet ,Integer value){
-
-        var wallet = walletRepository.findById(idWallet).orElseThrow(WalletNotFoundException::new);
-
-        if (value <= wallet.getBalance()){
-            wallet.setBalance(wallet.getBalance() - value);
-        }else {
-            throw new InsufficientFundsException();
-        }
-        return walletRepository.save(wallet);
-    }
+//    public WalletEntity debit(WalletDto walletDto){
+//
+//        var wallet = walletRepository.findById().orElseThrow(WalletNotFoundException::new);
+//
+//        if (value <= wallet.getBalance()){
+//            wallet.setBalance(wallet.getBalance().subtract());
+//        }else {
+//            throw new InsufficientFundsException();
+//        }
+//        return walletRepository.save(wallet);
+//    }
 
     public WalletEntity myWallet(long idUser){
         return walletRepository.findByUserId(idUser).orElseThrow(WalletNotFoundException::new);

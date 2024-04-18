@@ -24,16 +24,19 @@ public class SpotifyApi {
     public List<AlbumModel> getAlbums(String search) throws IOException, ParseException, SpotifyWebApiException {
 
         spotifyApi.setAccessToken(getToken());
-        return AlbumMapper.INSTANCE.toModel(spotifyApi.searchAlbums(search).market(CountryCode.BR)
+        return AlbumMapper.INSTANCE.toModel(spotifyApi.searchAlbums(search)
+                        .market(CountryCode.BR)
                         .limit(30)
                         .build().execute().getItems()).stream()
-                .peek(album -> album.setValue(BigDecimal.valueOf((Math.random() * ((100.00 - 12.00) + 1)) + 12.00)
-                        .setScale(2, RoundingMode.HALF_UP))).toList();
+                .peek(album -> album.setValue(BigDecimal.valueOf((Math.random() * ((100.00 - 12.00) + 1)) + 12.00).setScale(2, RoundingMode.HALF_UP))).toList();
 
     }
+
+
 
     public String getToken() throws IOException, ParseException, SpotifyWebApiException {
         ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
         return clientCredentialsRequest.execute().getAccessToken();
     }
+
 }

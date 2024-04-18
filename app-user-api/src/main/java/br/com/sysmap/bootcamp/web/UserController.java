@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -30,6 +31,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update User",
+            description = "This function is responsible for update user.")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Object> updateUser(@PathVariable long id ,@RequestBody UserDto userDto){
         try {
             var result = this.userService.update(id, userDto);
@@ -40,6 +44,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Search user",
+            description = "This function is responsible for search user by id.")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Object> searchUser(@PathVariable() long id){
         try {
             var result = this.userService.findById(id);
@@ -50,6 +57,9 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "Search All User",
+            description = "This function is responsible for search all user.")
+//    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Object> searchAllUsers(){
         try {
             var result = this.userService.findAll();

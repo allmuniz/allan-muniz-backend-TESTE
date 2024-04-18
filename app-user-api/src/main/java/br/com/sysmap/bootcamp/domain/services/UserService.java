@@ -6,7 +6,7 @@ import br.com.sysmap.bootcamp.domain.entities.user.exceptions.UserNotFoundExcept
 import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
 import br.com.sysmap.bootcamp.dto.UserDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Slf4j
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+//    private final PasswordEncoder passwordEncoder;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity save(UserDto userDto) {
@@ -26,11 +26,14 @@ public class UserService {
         this.userRepository.findByEmail(userDto.getEmail()).ifPresent((user) ->{
             throw new UserFoundException();
         });
+//        var password = passwordEncoder.encode(userDto.getPassword());
+
         var userEntity = UserEntity.builder()
                         .name(userDto.getName())
                         .email(userDto.getEmail())
                         .password(userDto.getPassword())
                         .build();
+
         return this.userRepository.save(userEntity);
     }
 

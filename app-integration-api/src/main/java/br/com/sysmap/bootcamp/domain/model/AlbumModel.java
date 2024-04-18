@@ -20,4 +20,5 @@ public class AlbumModel {
     private String releaseDate;
     private ModelObjectType type;
     private BigDecimal value;
+
 }

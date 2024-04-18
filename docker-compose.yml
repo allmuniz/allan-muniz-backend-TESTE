@@ -10,14 +10,30 @@ services:
     container_name: rabbitmq1_bootcamp
     networks:
       - backend1
-  postgres_bootcamp1:
+  postgres_bootcamp:
     build:
       context: ./postgres
-    image: allmuniz/postgres1_bootcamp:latest
+    image: allmuniz/postgres_bootcamp:latest
     ports:
-      - 5434:5432
-    command: bash -c "rm -rf /var/lib/postgresql/data/* && docker-entrypoint.sh postgres"
-    container_name: postgres1_bootcamp
+      - 5432:5432
+    container_name: postgres_bootcamp
+    networks:
+      - backend1
+  bootcamp-user-api1:
+    build:
+      context: ../allan-muniz-backend-TESTE/app-user-api
+      dockerfile: ../app-user-api/Dockerfile
+    image: allmuniz/app-user-api1:latest
+    ports:
+      - 8081:8081
+    container_name: app-user-api1
+    environment:
+      - POSTGRES_URL=postgres_bootcamp
+      - POSTGRES_USER=bootcamp
+      - POSTGRES_PASSWORD=bootcamppass
+      - POSTGRES_DATABASE=bootcamp
+    depends_on:
+      - postgres_bootcamp
     networks:
       - backend1
 networks:
