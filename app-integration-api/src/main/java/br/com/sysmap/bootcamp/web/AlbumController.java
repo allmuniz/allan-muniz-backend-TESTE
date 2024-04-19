@@ -18,9 +18,9 @@ public class AlbumController {
 
     private final AlbumService albumService;
 
-    @GetMapping("/teste")
-    public void teste() {
-        this.albumService.teste();
+    @PostMapping("/test/{albumId}")
+    public void buyAlbum(@PathVariable long albumId){
+        this.albumService.buyAlbum(albumId);
     }
 
     @GetMapping("/search")
@@ -28,10 +28,4 @@ public class AlbumController {
         var result = this.albumService.SearchAndSaveAlbums(search);
         return ResponseEntity.ok().body(result);
     }
-
-//    @GetMapping("/all")
-//    public ResponseEntity<List<AlbumModel>> getAlbums(@RequestParam("search") String search) throws IOException, ParseException, SpotifyWebApiException {
-//        return ResponseEntity.ok(this.albumService.getAlbums(search));
-//    }
-
 }

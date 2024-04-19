@@ -1,6 +1,7 @@
 package br.com.sysmap.bootcamp.domain.service;
 
 import br.com.sysmap.bootcamp.domain.entities.AlbumEntity;
+import br.com.sysmap.bootcamp.domain.entities.exceptions.AlbumNotFoundException;
 import br.com.sysmap.bootcamp.domain.model.AlbumModel;
 import br.com.sysmap.bootcamp.domain.repositories.AlbumRepository;
 import br.com.sysmap.bootcamp.domain.service.integration.SpotifyApi;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import java.io.IOException;
+//import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,14 +30,6 @@ public class AlbumService {
 
     private final SpotifyApi spotifyApi;
     private final AlbumRepository albumRepository;
-
-
-    public void teste() {
-        log.info("Teste");
-        WalletDto walletDto = new WalletDto();
-        walletDto.setTeste("Teste Allan Muniz");
-        this.template.convertAndSend(queue.getName(), walletDto);
-    }
 
     public List<AlbumModel> getAlbums(String search) throws IOException, ParseException, SpotifyWebApiException {
         return this.spotifyApi.getAlbums(search);
@@ -57,5 +51,17 @@ public class AlbumService {
             this.albumRepository.save(albumEntity);
         }
         return albums;
+    }
+
+    public void buyAlbum(long albumId){
+        log.info("Send");
+        WalletDto walletDto = new WalletDto();
+        var album = albumRepository.findById(albumId).orElseThrow(AlbumNotFoundException::new);
+
+        if(album.getUserId() == 0){
+            walletDto.setValue(album.getValue());
+            walletDto.setEmail("teste2@teste.teste");
+        }
+        this.template.convertAndSend(queue.getName(), walletDto);
     }
 }
