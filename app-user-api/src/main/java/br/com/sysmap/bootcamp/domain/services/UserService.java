@@ -4,20 +4,32 @@ import br.com.sysmap.bootcamp.domain.entities.user.UserEntity;
 import br.com.sysmap.bootcamp.domain.entities.user.exceptions.UserFoundException;
 import br.com.sysmap.bootcamp.domain.entities.user.exceptions.UserNotFoundException;
 import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
+import br.com.sysmap.bootcamp.dto.AuthDto;
 import br.com.sysmap.bootcamp.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final WalletService walletService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity save(UserDto userDto) {
@@ -26,10 +38,12 @@ public class UserService {
             throw new UserFoundException();
         });
 
+        var password = passwordEncoder.encode(userDto.getPassword());
+
         var userEntity = UserEntity.builder()
                         .name(userDto.getName())
                         .email(userDto.getEmail())
-                        .password(userDto.getPassword())
+                        .password(password)
                         .build();
         this.userRepository.save(userEntity);
         this.walletService.saveWallet(userEntity.getId());
@@ -37,14 +51,32 @@ public class UserService {
         return userEntity;
     }
 
-    public UserEntity update(long id, UserDto userDto) {
+    public AuthDto auth(AuthDto authDto) {
+        UserEntity userEntity = this.findByEmail(authDto.getEmail());
 
-       var user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-       user.setName(userDto.getName());
-       user.setEmail(userDto.getEmail());
-       user.setPassword(userDto.getPassword());
+        if (!this.passwordEncoder.matches(authDto.getPassword(), userEntity.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
 
-       return userRepository.save(user);
+        String password = userEntity.getEmail() + ":" + userEntity.getPassword();
+
+        return AuthDto.builder().email(userEntity.getEmail()).token(
+                Base64.getEncoder().withoutPadding().encodeToString(password.getBytes())
+        ).id(userEntity.getId()).build();
+    }
+
+    public UserEntity update(UserDto userDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        var password = passwordEncoder.encode(userDto.getPassword());
+
+        var user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(password);
+
+        return userRepository.save(user);
     }
 
     public UserEntity findById(Long id) {
@@ -54,4 +86,20 @@ public class UserService {
     public List<UserEntity> findAll() {
         return this.userRepository.findAll();
     }
+
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<UserEntity> usersOptional = this.userRepository.findByEmail(username);
+
+        return usersOptional.map(users -> new User(users.getEmail(), users.getPassword(), new ArrayList<>()))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
+    }
+
+    public UserEntity findByEmail(String email) {
+        return this.userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+
 }

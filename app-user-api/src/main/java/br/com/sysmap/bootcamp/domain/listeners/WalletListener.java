@@ -18,7 +18,7 @@ public class WalletListener {
 
     @RabbitHandler
     public void receive(WalletDto walletDto) {
-        log.info("Received walletDto: {}", walletDto);
         walletService.debit(walletDto);
+        log.info("Received walletDto: {}", walletDto);
     }
 }
