@@ -7,7 +7,6 @@ import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
 import br.com.sysmap.bootcamp.dto.AuthDto;
 import br.com.sysmap.bootcamp.dto.UserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,17 +65,16 @@ public class UserService implements UserDetailsService {
     }
 
     public UserEntity update(UserDto userDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        var user = getUser();
 
         var password = passwordEncoder.encode(userDto.getPassword());
 
-        var user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(password);
+        var userentity = userRepository.findByEmail(user.get().getEmail()).orElseThrow(UserNotFoundException::new);
+        userentity.setName(userDto.getName());
+        userentity.setEmail(userDto.getEmail());
+        userentity.setPassword(password);
 
-        return userRepository.save(user);
+        return userRepository.save(userentity);
     }
 
     public UserEntity findById(Long id) {
@@ -101,5 +99,9 @@ public class UserService implements UserDetailsService {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-
+    private Optional<UserEntity> getUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal().toString();
+        return userRepository.findByEmail(username);
+    }
 }
