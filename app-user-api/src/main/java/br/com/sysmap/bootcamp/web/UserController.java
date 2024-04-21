@@ -1,5 +1,6 @@
 package br.com.sysmap.bootcamp.web;
 
+import br.com.sysmap.bootcamp.domain.entities.user.UserEntity;
 import br.com.sysmap.bootcamp.domain.services.UserService;
 import br.com.sysmap.bootcamp.dto.AuthDto;
 import br.com.sysmap.bootcamp.dto.UserDto;
@@ -34,13 +35,13 @@ public class UserController {
     @PostMapping("/auth")
     @Operation(summary = "Auth User",
             description = "This function is responsible for authenticate user access.")
-    public ResponseEntity<AuthDto> auth(@RequestBody AuthDto user) {        //PRONTO
+    public ResponseEntity<AuthDto> auth(@RequestBody AuthDto user) {
         return ResponseEntity.ok(this.userService.auth(user));
     }
 
     @PutMapping("/update")
     @Operation(summary = "Update User",
-            description = "This function is responsible for update user.")      //PRONTO
+            description = "This function is responsible for update user.")
     public ResponseEntity<Object> updateUser(@RequestBody UserDto userDto){
         try {
             var result = this.userService.update(userDto);

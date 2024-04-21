@@ -69,12 +69,12 @@ public class UserService implements UserDetailsService {
 
         var password = passwordEncoder.encode(userDto.getPassword());
 
-        var userentity = userRepository.findByEmail(user.get().getEmail()).orElseThrow(UserNotFoundException::new);
-        userentity.setName(userDto.getName());
-        userentity.setEmail(userDto.getEmail());
-        userentity.setPassword(password);
+        var userEntity = userRepository.findByEmail(user.get().getEmail()).orElseThrow(UserNotFoundException::new);
+        userEntity.setName(userDto.getName());
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setPassword(password);
 
-        return userRepository.save(userentity);
+        return userRepository.save(userEntity);
     }
 
     public UserEntity findById(Long id) {
@@ -99,7 +99,7 @@ public class UserService implements UserDetailsService {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    private Optional<UserEntity> getUser() {
+    public Optional<UserEntity> getUser() {
         String username = SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString();
         return userRepository.findByEmail(username);

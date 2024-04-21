@@ -75,7 +75,7 @@ public class WalletService {
         return walletRepository.findByUserId(user.get().getId()).orElseThrow(WalletNotFoundException::new);
     }
 
-    private Optional<UserEntity> getUser() {
+    public Optional<UserEntity> getUser() {
         String username = SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString();
         return userRepository.findByEmail(username);

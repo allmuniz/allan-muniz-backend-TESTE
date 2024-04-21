@@ -1,7 +1,6 @@
 package br.com.sysmap.bootcamp.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,6 +8,9 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WalletDto implements Serializable {
 
     @Serial
