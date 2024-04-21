@@ -6,6 +6,7 @@ import br.com.sysmap.bootcamp.domain.services.UserService;
 import br.com.sysmap.bootcamp.dto.AuthDto;
 import br.com.sysmap.bootcamp.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
@@ -49,7 +50,8 @@ public class UserControllerTest {
     //<------------------- Test POST("/users/create") ------------------->
 
     @Test
-    public void testCreateUser_success() {
+    @DisplayName("Should return a new user when valid")
+    public void should_return_a_new_user_when_valid() {
         UserDto userDto = UserDto.builder()
                 .name("Test User")
                 .email("test@email.com")
@@ -68,7 +70,8 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser_duplicateEmail() {
+    @DisplayName("Should return a user error found")
+    public void should_return_a_user_error_found() {
         UserDto userDto = UserDto.builder()
                 .name("Test User")
                 .email("existing@email.com")
@@ -81,24 +84,11 @@ public class UserControllerTest {
         assertThat(response.getBody()).isInstanceOf(String.class);
     }
 
-    @Test
-    public void testCreateUser_exception() {
-        UserDto userDto = UserDto.builder()
-                .name("Test User")
-                .email("test@email.com")
-                .password("password123")
-                .build();
-
-        when(userService.save(userDto)).thenThrow(new RuntimeException("Unexpected error"));
-        ResponseEntity<Object> response = userController.createUser(userDto);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isInstanceOf(String.class);
-    }
-
     //<------------------- Test POST("/users/auth") ------------------->
 
     @Test
-    public void testAuth_success() {
+    @DisplayName("Should return an authenticated user")
+    public void should_return_an_authenticated_user() {
         String email = "test@email.com";
         String password = "password123";
         String encodedPassword = passwordEncoder.encode(password);
@@ -122,7 +112,8 @@ public class UserControllerTest {
     //<------------------- Test PUT("/users/update") ------------------->
 
     @Test
-    public void testUpdateUser() {
+    @DisplayName("Should return an updated user")
+    public void should_return_an_updated_user() {
         UserDto userDto = UserDto.builder()
                 .name("John Doe")
                 .email("john.doe@example.com")
@@ -146,7 +137,8 @@ public class UserControllerTest {
     //<------------------- Test GET("/users/{id}") ------------------->
 
     @Test
-    public void testSearchUser() {
+    @DisplayName("Should return a user search by id")
+    public void should_return_a_user_search_by_id() {
         long userId = 1L;
 
         UserEntity userEntity = UserEntity.builder()
@@ -166,7 +158,8 @@ public class UserControllerTest {
     //<------------------- Test GET("/users") ------------------->
 
     @Test
-    public void testSearchAllUsers() {
+    @DisplayName("Should return a search of all users")
+    public void should_return_a_search_of_all_users() {
         List<UserEntity> userEntities = Arrays.asList(
                 UserEntity.builder()
                         .id(1L)

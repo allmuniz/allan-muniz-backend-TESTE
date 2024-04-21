@@ -44,7 +44,8 @@ public class AlbumController {
     @DeleteMapping("/remove/{id}")
     @Operation(summary = "Remove an album by ID",
             description = "This function is responsible for removing an album.")
-    public void removeAlbum(@PathVariable long id){
+    public ResponseEntity<String> removeAlbum(@PathVariable long id){
         albumService.deleteAlbum(id);
+        return null;
     }
 }

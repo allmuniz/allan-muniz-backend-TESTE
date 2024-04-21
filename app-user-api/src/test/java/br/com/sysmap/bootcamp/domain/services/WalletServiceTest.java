@@ -5,6 +5,7 @@ import br.com.sysmap.bootcamp.domain.entities.wallet.WalletEntity;
 import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
 import br.com.sysmap.bootcamp.domain.repositories.WalletRepository;
 import br.com.sysmap.bootcamp.dto.WalletDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,8 @@ public class WalletServiceTest {
     private WalletRepository walletRepository;
 
     @Test
-    public void testDebit() {
+    @DisplayName("Should return a success for the debit operation")
+    public void should_return_a_success_for_the_debit_operation() {
         UserEntity user = new UserEntity();
         user.setId(1L);
 
@@ -70,15 +72,14 @@ public class WalletServiceTest {
 
         verify(walletRepository, times(1)).save(wallet);
     }
-    
+
     @Test
-    public void testDebit_insufficientFunds(){
-        // Given (arrange)
+    @DisplayName("Should return an insufficient balance error")
+    public void should_return_an_insufficient_balance_error(){
         String testEmail = "test@example.com";
         BigDecimal testValue = new BigDecimal(300);
         BigDecimal initialBalance = new BigDecimal(100);
 
-        // Mocks
         UserEntity userMock = new UserEntity();
         userMock.setEmail(testEmail);
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(userMock));

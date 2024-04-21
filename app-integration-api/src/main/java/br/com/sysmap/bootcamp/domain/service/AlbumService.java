@@ -80,7 +80,7 @@ public class AlbumService {
         return albumRepository.findAllByUserId(user.getId());
     }
 
-    public void deleteAlbum(long id){
+    public ResponseEntity<String> deleteAlbum(long id){
         var user = getUser();
         var collection = albumRepository.findAllByUserId(user.getId());
 
@@ -88,7 +88,7 @@ public class AlbumService {
                 .filter(album -> album.getId().equals(id)).findFirst();
         albumToDelete.ifPresent(albumRepository::delete);
 
-        ResponseEntity.ok().body("The id has been removed: " + id);
+        return ResponseEntity.ok().body("The id has been removed: " + id);
     }
 
     private UserEntity getUser() {

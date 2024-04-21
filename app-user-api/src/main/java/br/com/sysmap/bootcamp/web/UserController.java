@@ -1,6 +1,5 @@
 package br.com.sysmap.bootcamp.web;
 
-import br.com.sysmap.bootcamp.domain.entities.user.UserEntity;
 import br.com.sysmap.bootcamp.domain.services.UserService;
 import br.com.sysmap.bootcamp.dto.AuthDto;
 import br.com.sysmap.bootcamp.dto.UserDto;

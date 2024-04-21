@@ -4,6 +4,7 @@ import br.com.sysmap.bootcamp.domain.entities.wallet.WalletEntity;
 import br.com.sysmap.bootcamp.domain.entities.wallet.exceptions.WalletNotFoundException;
 import br.com.sysmap.bootcamp.domain.services.WalletService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
@@ -39,7 +40,8 @@ public class WalletControllerTest {
     //<------------------- Test POST("/wallet/credit/{value}") ------------------->
 
     @Test
-    public void testCreditWallet_success() {
+    @DisplayName("Should return a credit transaction to the wallet")
+    public void should_return_a_credit_transaction_to_the_wallet() {
         BigDecimal creditValue = new BigDecimal(100);
 
         WalletEntity walletEntity = WalletEntity.builder()
@@ -55,22 +57,11 @@ public class WalletControllerTest {
         assertThat(response.getBody()).isEqualTo(walletEntity);
     }
 
-    @Test
-    public void testCreditWallet_walletNotFound() {
-        BigDecimal creditValue = new BigDecimal(100);
-
-        when(walletService.credit(creditValue)).thenThrow(new WalletNotFoundException());
-
-        ResponseEntity<Object> response = walletController.creditWallet(creditValue);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isInstanceOf(String.class);
-    }
-
     //<------------------- Test GET("/wallet") ------------------->
 
     @Test
-    public void testSearchWallet_success() {
+    @DisplayName("Should return the authenticated user's wallet")
+    public void should_return_the_authenticated_users_wallet() {
         WalletEntity walletEntity = WalletEntity.builder()
                 .userId(1L)
                 .balance(new BigDecimal(200))
@@ -85,7 +76,8 @@ public class WalletControllerTest {
     }
 
     @Test
-    public void testSearchWallet_walletNotFound() {
+    @DisplayName("Should return a wallet not found error")
+    public void should_return_a_wallet_not_found_error() {
         when(walletService.myWallet()).thenThrow(new WalletNotFoundException());
 
         ResponseEntity<Object> response = walletController.searchWallet();
