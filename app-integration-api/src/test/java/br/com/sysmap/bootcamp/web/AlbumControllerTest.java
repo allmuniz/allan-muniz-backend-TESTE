@@ -38,6 +38,7 @@ public class AlbumControllerTest {
     @MockBean
     private AlbumRepository albumRepository;
 
+    //<-----------------------------GET("/albums/all")<-----------------------------//
     @Test
     @DisplayName("Should return list of albums and save to database")
     public void should_return_list_of_albums_and_save_to_database() throws Exception {
@@ -69,6 +70,8 @@ public class AlbumControllerTest {
         return new ArrayList<>();
     }
 
+    //<-----------------------------GET("/albums//my-collection")<-----------------------------//
+
     @Test
     @DisplayName("Should return a collection of albums for a given user")
     public void should_return_a_collection_of_albums_for_a_given_user(){
@@ -88,8 +91,8 @@ public class AlbumControllerTest {
         );
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
-                .email("john.doe@example.com")
-                .password("encodedPassword")
+                .email("test@email.com")
+                .password("password123")
                 .build();
         when(albumRepository.findAllByUserId(userEntity.getId())).thenReturn(albumEntity);
 

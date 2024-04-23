@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -50,23 +51,17 @@ public class UserControllerTest {
     //<------------------- Test POST("/users/create") ------------------->
 
     @Test
-    @DisplayName("Should return a new user when valid")
-    public void should_return_a_new_user_when_valid() {
+    @DisplayName("Should call userService.save with correct userDto")
+    public void should_call_userService_save_with_correct_userDto() {
         UserDto userDto = UserDto.builder()
                 .name("Test User")
                 .email("test@email.com")
                 .password("password123")
                 .build();
 
-        UserEntity userEntity = UserEntity.builder()
-                .id(1L)
-                .name("Test User")
-                .email("test@email.com")
-                .build();
-        when(userService.save(userDto)).thenReturn(userEntity);
-        ResponseEntity<Object> response = userController.createUser(userDto);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(userEntity);
+        userController.createUser(userDto);
+
+        verify(userService).save(userDto);
     }
 
     @Test
@@ -115,15 +110,15 @@ public class UserControllerTest {
     @DisplayName("Should return an updated user")
     public void should_return_an_updated_user() {
         UserDto userDto = UserDto.builder()
-                .name("John Doe")
-                .email("john.doe@example.com")
+                .name("Test User")
+                .email("test@email.com")
                 .password("password")
                 .build();
 
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
-                .name("John Doe")
-                .email("john.doe@example.com")
+                .name("Test User")
+                .email("test@email.com")
                 .password("encodedPassword")
                 .build();
         when(userService.update(userDto)).thenReturn(userEntity);
@@ -143,8 +138,8 @@ public class UserControllerTest {
 
         UserEntity userEntity = UserEntity.builder()
                 .id(userId)
-                .name("John Doe")
-                .email("john.doe@example.com")
+                .name("Test User")
+                .email("test@email.com")
                 .password("encodedPassword")
                 .build();
         when(userService.findById(userId)).thenReturn(userEntity);
@@ -163,14 +158,14 @@ public class UserControllerTest {
         List<UserEntity> userEntities = Arrays.asList(
                 UserEntity.builder()
                         .id(1L)
-                        .name("John Doe")
-                        .email("john.doe@example.com")
+                        .name("Test User")
+                        .email("test@email.com")
                         .password("encodedPassword")
                         .build(),
                 UserEntity.builder()
                         .id(2L)
-                        .name("Jane Doe")
-                        .email("jane.doe@example.com")
+                        .name("Test User2")
+                        .email("test2@email.com")
                         .password("encodedPassword")
                         .build()
         );

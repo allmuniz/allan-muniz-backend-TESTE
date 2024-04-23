@@ -21,7 +21,7 @@ services:
       - backend1
   bootcamp-user-api1:
     build:
-      context: ../allan-muniz-backend-TESTE/app-user-api
+      context: ../allan-muniz-backend/app-user-api
       dockerfile: ../app-user-api/Dockerfile
     image: allmuniz/app-user-api1:latest
     ports:

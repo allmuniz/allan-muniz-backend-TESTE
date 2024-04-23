@@ -1,16 +1,23 @@
 package br.com.sysmap.bootcamp.domain.services;
 
 import br.com.sysmap.bootcamp.domain.entities.user.UserEntity;
+import br.com.sysmap.bootcamp.domain.entities.user.exceptions.UserNotFoundException;
 import br.com.sysmap.bootcamp.domain.entities.wallet.WalletEntity;
 import br.com.sysmap.bootcamp.domain.repositories.UserRepository;
 import br.com.sysmap.bootcamp.domain.repositories.WalletRepository;
 import br.com.sysmap.bootcamp.dto.WalletDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -20,13 +27,15 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class WalletServiceTest {
+@AutoConfigureMockMvc(addFilters = false)
+class WalletServiceTest {
 
     @Autowired
     private WalletService walletService;
@@ -36,6 +45,60 @@ public class WalletServiceTest {
 
     @MockBean
     private WalletRepository walletRepository;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @BeforeEach
+    public void setup() {
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @Test
+    @DisplayName("Should save wallet for user")
+    public void should_save_wallet_for_user() {
+        long userId = 1L;
+        UserEntity userEntity = UserEntity.builder().id(userId).build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+
+        walletService.saveWallet(userId);
+
+        verify(walletRepository, times(1)).save(any(WalletEntity.class));
+    }
+
+    @Test
+    @DisplayName("Should throw UserNotFoundException when user is not found")
+    public void should_throw_UserNotFoundException_when_user_is_not_found() {
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> walletService.saveWallet(userId));
+    }
+
+    @Test
+    public void testCredit() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn("test@example.com");
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        userEntity.setEmail("test@example.com");
+        Optional<UserEntity> optionalUserEntity = Optional.of(userEntity);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(optionalUserEntity);
+
+        WalletEntity walletEntity = new WalletEntity();
+        walletEntity.setId(1L);
+        walletEntity.setUserId(1L);
+        walletEntity.setBalance(BigDecimal.valueOf(50));
+        when(walletRepository.findById(1L)).thenReturn(Optional.of(walletEntity));
+
+        walletService.credit(BigDecimal.valueOf(100));
+
+        assertEquals(BigDecimal.valueOf(150), walletEntity.getBalance());
+    }
 
     @Test
     @DisplayName("Should return a success for the debit operation")
@@ -93,6 +156,28 @@ public class WalletServiceTest {
 
         WalletDto walletDto = new WalletDto(testEmail, testValue);
         walletService.debit(walletDto);
+    }
+
+    @Test
+    public void testMyWallet() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn("test@example.com");
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        userEntity.setEmail("test@example.com");
+        Optional<UserEntity> optionalUserEntity = Optional.of(userEntity);
+        when(userRepository.findByEmail("test@example.com")).thenReturn(optionalUserEntity);
+
+        WalletEntity walletEntity = new WalletEntity();
+        walletEntity.setId(1L);
+        walletEntity.setUserId(1L);
+        when(walletRepository.findByUserId(1L)).thenReturn(Optional.of(walletEntity));
+
+        WalletEntity returnedWallet = walletService.myWallet();
+
+        assertNotNull(returnedWallet);
+        assertEquals(1L, returnedWallet.getUserId());
     }
 }
 
